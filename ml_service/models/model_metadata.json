@@ -1,0 +1,38 @@
+{
+  "trained_at": "2026-05-24T16:21:19.085138+00:00",
+  "n_samples": 3000,
+  "n_features": 19,
+  "feature_columns": [
+    "fertilizer_organic",
+    "fertilizer_mixed",
+    "fertilizer_inorganic",
+    "soil_excellent",
+    "soil_good",
+    "soil_average",
+    "soil_poor",
+    "irrigation_drip",
+    "irrigation_sprinkler",
+    "irrigation_canal",
+    "irrigation_rainfed",
+    "irrigation_borewell",
+    "season_kharif",
+    "season_rabi",
+    "season_zaid",
+    "season_annual",
+    "seasonal_match",
+    "area_hectares_norm",
+    "fertilizer_qty_norm"
+  ],
+  "seed": 42,
+  "data_source": "synthetic",
+  "organic_model": {
+    "test_roc_auc": 0.9717,
+    "cv_roc_auc_mean": 0.9757,
+    "cv_roc_auc_std": 0.0055
+  },
+  "fraud_model": {
+    "test_roc_auc": 0.662,
+    "cv_roc_auc_mean": 0.5829,
+    "cv_roc_auc_std": 0.0695
+  }
+}

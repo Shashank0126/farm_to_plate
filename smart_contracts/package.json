@@ -1,0 +1,18 @@
+{
+  "name": "farm-to-plate-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "compile":  "hardhat compile",
+    "test":     "hardhat test",
+    "coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "node":     "hardhat node"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.2",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -4,6 +4,7 @@ import DashboardLayout from '../../components/common/DashboardLayout'
 import QRDisplay from '../../components/farmer/QRDisplay'
 import TxHashBadge from '../../components/blockchain/TxHashBadge'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import PredictionCard from '../../components/common/PredictionCard'
 import TrustScore from '../../components/common/TrustScore'
 import FarmMap from '../../components/consumer/FarmMap'
 import batchService from '../../services/batch.service'
@@ -119,11 +120,16 @@ export default function BatchDetail() {
 
         {/* Right — QR + blockchain + score */}
         <div className="space-y-4">
-          {/* Organic score */}
-          <div className="glass-card">
-            <p className="text-xs text-white/40 mb-3 uppercase tracking-wider">Organic Score</p>
-            <OrganicBadge score={batch.organicScore} showBar />
-          </div>
+          {/* Organic score & Dual AI Predictions */}
+          <PredictionCard
+            organicScore={batch.organicScore}
+            mlPrediction={batch.mlPrediction}
+            groqScore={batch.groqScore}
+            groqConfidence={batch.groqConfidence}
+            groqReasoning={batch.groqReasoning}
+            fraudRisk={batch.fraudRisk}
+            title="Authenticity & AI Predictions"
+          />
 
           {/* QR code */}
           {batch.status === 'verified' && (

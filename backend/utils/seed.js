@@ -9,10 +9,10 @@ const blockchain = require('../blockchain/Blockchain')
 const MONGO_URI = process.env.MONGO_URI
 
 const USERS = [
-  { name: 'Ravi Kumar',       email: 'farmer@demo.com',    password: 'demo1234', role: 'farmer',    phone: '+91 98765 43210', trustScore: 4.7 },
-  { name: 'Priya Singh',      email: 'farmer2@demo.com',   password: 'demo1234', role: 'farmer',    phone: '+91 87654 32109', trustScore: 4.2 },
-  { name: 'Agro Traders Ltd', email: 'purchaser@demo.com', password: 'demo1234', role: 'purchaser', phone: '+91 76543 21098' },
-  { name: 'Admin User',       email: 'admin@demo.com',     password: 'demo1234', role: 'admin',     phone: '+91 65432 10987' },
+  { name: 'Ravi Kumar',       email: 'farmer@demo.com',    password: 'demo1234', role: 'farmer',    phone: '+91 98765 43210', aadhaarNumber: '123456789012', trustScore: 4.7 },
+  { name: 'Priya Singh',      email: 'farmer2@demo.com',   password: 'demo1234', role: 'farmer',    phone: '+91 87654 32109', aadhaarNumber: '234567890123', trustScore: 4.2 },
+  { name: 'Agro Traders Ltd', email: 'purchaser@demo.com', password: 'demo1234', role: 'purchaser', phone: '+91 76543 21098', aadhaarNumber: '345678901234' },
+  { name: 'Admin User',       email: 'admin@demo.com',     password: 'demo1234', role: 'admin',     phone: '+91 65432 10987', aadhaarNumber: '456789012345' },
 ]
 
 const BATCHES = (farmerId) => [
@@ -27,6 +27,11 @@ const BATCHES = (farmerId) => [
     fertilizerType: 'Organic', fertilizerName: 'Compost', fertilizerQty: 120,
     irrigationType: 'Canal',
     organicScore: 82,
+    mlPrediction: 85,
+    fraudRisk: 5,
+    groqScore: 88,
+    groqConfidence: 'high',
+    groqReasoning: 'Strict organic compost usage paired with high-quality loamy soil and canal irrigation confirms strong organic authenticity.',
     status: 'verified',
     blockchainHash: '00' + 'a'.repeat(62),
     blockIndex: 1,
@@ -45,6 +50,11 @@ const BATCHES = (farmerId) => [
     fertilizerType: 'Mixed', fertilizerName: 'NPK + Compost', fertilizerQty: 80,
     irrigationType: 'Drip',
     organicScore: 65,
+    mlPrediction: 62,
+    fraudRisk: 18,
+    groqScore: 68,
+    groqConfidence: 'medium',
+    groqReasoning: 'Mixed fertilizer application (NPK alongside Compost) reduces organic purity. Drip irrigation and good soil quality support moderate classification.',
     status: 'pending',
     proofImages: [],
   },
@@ -59,6 +69,11 @@ const BATCHES = (farmerId) => [
     fertilizerType: 'Inorganic', fertilizerName: 'Urea', fertilizerQty: 200,
     irrigationType: 'Sprinkler',
     organicScore: 28,
+    mlPrediction: 25,
+    fraudRisk: 72,
+    groqScore: 22,
+    groqConfidence: 'high',
+    groqReasoning: 'Heavy synthetic Urea application indicates non-organic farming practices.',
     status: 'rejected',
     adminNote: 'Fertilizer bill not clearly legible. Please resubmit.',
     proofImages: [],

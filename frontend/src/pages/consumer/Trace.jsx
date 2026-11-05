@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import FarmMap from '../../components/consumer/FarmMap'
 import TraceTimeline from '../../components/consumer/TraceTimeline'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import PredictionCard from '../../components/common/PredictionCard'
 import TrustScore from '../../components/common/TrustScore'
 import TxHashBadge from '../../components/blockchain/TxHashBadge'
 import batchService from '../../services/batch.service'
@@ -147,22 +148,31 @@ export default function Trace() {
             </div>
           </div>
 
-          {/* Score row */}
-          <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* Prediction Card */}
+          <div className="mt-5">
+            <PredictionCard
+              organicScore={batch.organicScore}
+              mlPrediction={batch.mlPrediction}
+              groqScore={batch.groqScore}
+              groqConfidence={batch.groqConfidence}
+              groqReasoning={batch.groqReasoning}
+              fraudRisk={batch.fraudRisk}
+              title="Verified Organic Authenticity & Predictions"
+            />
+          </div>
+
+          {/* Quick info row */}
+          <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-3">
             <div className="glass rounded-xl p-3">
-              <p className="text-[10px] text-white/30 mb-1.5">Organic Score</p>
-              <OrganicBadge score={batch.organicScore} showBar />
-            </div>
-            <div className="glass rounded-xl p-3">
-              <p className="text-[10px] text-white/30 mb-1.5">Farmer Trust</p>
+              <p className="text-[10px] text-white/30 mb-1">Farmer Trust Rating</p>
               <TrustScore score={batch.farmer?.trustScore ?? 0} reviews={batch.farmer?.reviewCount ?? 0} size="sm" />
             </div>
             <div className="glass rounded-xl p-3">
-              <p className="text-[10px] text-white/30 mb-1.5">Harvest Date</p>
+              <p className="text-[10px] text-white/30 mb-1">Harvest Date</p>
               <p className="text-sm text-white/80">{fmtDate(batch.harvestDate)}</p>
             </div>
-            <div className="glass rounded-xl p-3">
-              <p className="text-[10px] text-white/30 mb-1.5">Season</p>
+            <div className="glass rounded-xl p-3 col-span-2 md:col-span-1">
+              <p className="text-[10px] text-white/30 mb-1">Season</p>
               <p className="text-sm text-white/80">{batch.season}</p>
             </div>
           </div>

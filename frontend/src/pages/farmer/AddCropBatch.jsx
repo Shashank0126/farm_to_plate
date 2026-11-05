@@ -2,12 +2,13 @@ import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../components/common/DashboardLayout'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import PredictionCard from '../../components/common/PredictionCard'
 import { calcOrganicScore } from '../../utils/organicScore'
 import batchService from '../../services/batch.service'
 import toast from 'react-hot-toast'
 import {
   Sprout, MapPin, Beaker, Droplets, Calendar, Upload,
-  X, Image, FileText, ChevronRight, ChevronLeft, Check, Info
+  X, Image, FileText, ChevronRight, ChevronLeft, Check, Info, Sparkles, Cpu
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -38,6 +39,8 @@ export default function AddCropBatch() {
   const [form,   setForm]   = useState(EMPTY)
   const [files,  setFiles]  = useState({ cropImages: [], fertilizerBill: [], soilReport: [], farmPhotos: [] })
   const [loading, setLoading] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiResult, setAiResult]   = useState(null)
 
   const preview = calcOrganicScore({
     fertilizerType: form.fertilizerType,
@@ -46,6 +49,19 @@ export default function AddCropBatch() {
     irrigationType: form.irrigationType,
     cropName:       form.cropName,
   })
+
+  const runAiPreview = async () => {
+    setAiLoading(true)
+    try {
+      const res = await batchService.predictPreview(form)
+      setAiResult(res.data)
+      toast.success('Live 🌱 Farm Check & 🤖 AI Farm Check evaluated!')
+    } catch {
+      toast.error('Failed to run AI prediction preview')
+    } finally {
+      setAiLoading(false)
+    }
+  }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
   const handleChange = e => set(e.target.name, e.target.value)
@@ -190,11 +206,46 @@ export default function AddCropBatch() {
         </div>
       </div>
 
-      {/* Live organic score preview */}
+      {/* Live organic score & AI prediction preview */}
       {(form.fertilizerType || form.soilQuality) && (
-        <div className="glass rounded-xl p-4 border border-white/10">
-          <p className="text-xs text-white/40 mb-2">Live Organic Score Preview</p>
-          <OrganicBadge score={preview} showBar />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-white/60">Live Prediction Preview</span>
+            <button
+              type="button"
+              onClick={runAiPreview}
+              disabled={aiLoading}
+              className="btn-secondary text-xs py-1 px-2.5 flex items-center gap-1.5 border-violet-500/30 text-violet-300 hover:bg-violet-900/30"
+            >
+              {aiLoading ? (
+                <span className="w-3.5 h-3.5 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Sparkles size={12} className="text-violet-400" />
+                  <span>Run 🌱 Farm Check & 🤖 AI Farm Check</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {aiResult ? (
+            <PredictionCard
+              organicScore={aiResult.organicScore}
+              mlPrediction={aiResult.mlPrediction}
+              groqScore={aiResult.groqScore}
+              groqConfidence={aiResult.groqConfidence}
+              groqReasoning={aiResult.groqReasoning}
+              title="Live 🌱 Farm Check & 🤖 AI Farm Check Evaluation"
+            />
+          ) : (
+            <div className="glass rounded-xl p-4 border border-white/10">
+              <p className="text-xs text-white/40 mb-2">Baseline Organic Score Preview</p>
+              <OrganicBadge score={preview} showBar />
+              <p className="text-[11px] text-violet-300/80 mt-2 flex items-center gap-1">
+                <Sparkles size={10} /> Click "Run 🌱 Farm Check & 🤖 AI Farm Check" above to evaluate both models before submitting.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -254,13 +305,20 @@ export default function AddCropBatch() {
           </div>
         ))}
       </div>
-      <div className="glass-card border border-brand-700/30">
-        <p className="text-xs text-white/40 mb-1">Estimated Organic Score</p>
-        <OrganicBadge score={preview} showBar />
-      </div>
+      
+      {/* Prediction Preview Card */}
+      <PredictionCard
+        organicScore={aiResult?.organicScore ?? preview}
+        mlPrediction={aiResult?.mlPrediction}
+        groqScore={aiResult?.groqScore}
+        groqConfidence={aiResult?.groqConfidence}
+        groqReasoning={aiResult?.groqReasoning}
+        title="Batch Predictions Summary"
+      />
+
       <div className="glass rounded-xl p-4 border border-yellow-700/20 bg-yellow-900/10">
         <p className="text-xs text-yellow-300 font-medium">⚠ After submission</p>
-        <p className="text-xs text-white/40 mt-1">Your batch will be in <strong className="text-white/60">Pending</strong> state until an admin verifies your proof documents. Only verified batches are added to the blockchain.</p>
+        <p className="text-xs text-white/40 mt-1">Your batch will be evaluated by both 🌱 Farm Check and 🤖 AI Farm Check upon creation. Admin will verify your proof documents before writing to blockchain.</p>
       </div>
     </div>,
   ]

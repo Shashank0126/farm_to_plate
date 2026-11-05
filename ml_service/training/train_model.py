@@ -31,9 +31,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
+DATASET_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "crop_batches_dataset.csv")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-# ── 1. Synthetic dataset generation ──────────────────────────────
+# ── 1. Dataset loading & Synthetic fallback ──────────────────────
+def load_dataset(data_path: str = DATASET_PATH) -> pd.DataFrame:
+    """
+    Load dataset from CSV if available, otherwise fallback to synthetic dataset.
+    """
+    if os.path.exists(data_path):
+        logger.info("Loading training dataset from CSV: %s", data_path)
+        return pd.read_csv(data_path)
+    else:
+        logger.info("CSV file not found at %s. Generating synthetic dataset...", data_path)
+        return generate_dataset(n_samples=3000)
+
+
 def generate_dataset(n_samples: int = 2000) -> pd.DataFrame:
     """
     Generate synthetic training data reflecting domain rules.
@@ -111,8 +124,8 @@ def featurise(df: pd.DataFrame) -> np.ndarray:
 
 # ── 2. Train ─────────────────────────────────────────────────────
 def train():
-    logger.info("Generating synthetic dataset …")
-    df = generate_dataset(n_samples=3000)
+    logger.info("Loading dataset …")
+    df = load_dataset()
     logger.info("Dataset shape: %s", df.shape)
     logger.info("Organic label distribution:\n%s", df["is_organic"].value_counts())
     logger.info("Fraud label distribution:\n%s",   df["is_fraud"].value_counts())

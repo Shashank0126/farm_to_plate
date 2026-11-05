@@ -5,8 +5,9 @@ const userSchema = new mongoose.Schema({
   name:       { type: String, required: true, trim: true },
   email:      { type: String, required: true, unique: true, lowercase: true, trim: true },
   password:   { type: String, required: true, minlength: 8, select: false },
-  phone:      { type: String, trim: true },
-  role:       { type: String, enum: ['farmer', 'purchaser', 'admin'], default: 'farmer' },
+  phone:         { type: String, trim: true },
+  aadhaarNumber: { type: String, unique: true, sparse: true, trim: true },
+  role:          { type: String, enum: ['farmer', 'purchaser', 'admin'], default: 'farmer' },
 
   // Farmer-specific
   trustScore:      { type: Number, default: 5.0, min: 0, max: 5 },

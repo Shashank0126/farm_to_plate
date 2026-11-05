@@ -1,0 +1,28 @@
+```gitignore
+# Node dependencies
+**/node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+venv/
+.venv/
+**/__pycache__/
+*.pyc
+
+# Frontend build
+frontend/dist/
+
+# Hardhat generated files
+smart_contracts/artifacts/
+smart_contracts/cache/
+
+# IDE
+.vscode/
+
+# Generated structure output
+project_structure.txt
+```

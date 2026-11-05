@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '../../components/common/DashboardLayout'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import DualPredictionBadge from '../../components/common/DualPredictionBadge'
+import PredictionCard from '../../components/common/PredictionCard'
 import TxHashBadge from '../../components/blockchain/TxHashBadge'
 import batchService from '../../services/batch.service'
 import { fmtDate, fmtDateTime } from '../../utils/formatDate'
@@ -96,6 +98,7 @@ export default function VerifyBatches() {
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <OrganicBadge score={b.organicScore} />
+                    <DualPredictionBadge mlPrediction={b.mlPrediction} groqScore={b.groqScore} />
                     <span className={b.status === 'verified' ? 'badge-green' : b.status === 'rejected' ? 'badge-red' : 'badge-yellow'}>
                       {b.status}
                     </span>
@@ -170,11 +173,16 @@ export default function VerifyBatches() {
                 ) : null)}
               </div>
 
-              {/* Organic score */}
-              <div className="glass rounded-xl p-3">
-                <p className="text-xs text-white/40 mb-2">Organic Score</p>
-                <OrganicBadge score={selected.organicScore} showBar />
-              </div>
+              {/* Scores & Predictions */}
+              <PredictionCard
+                organicScore={selected.organicScore}
+                mlPrediction={selected.mlPrediction}
+                groqScore={selected.groqScore}
+                groqConfidence={selected.groqConfidence}
+                groqReasoning={selected.groqReasoning}
+                fraudRisk={selected.fraudRisk}
+                title="Organic Verification & Model Predictions"
+              />
 
               {/* Proof images */}
               {selected.proofImages?.length > 0 && (

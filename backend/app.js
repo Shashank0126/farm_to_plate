@@ -10,7 +10,7 @@ const app = express()
 // ── Security middleware ──────────────────────────────────────────
 app.use(helmet())
 app.use(cors({
-  origin:      process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: true,
   credentials: true,
 }))
 
@@ -43,6 +43,7 @@ app.use('/api/blockchain',  require('./routes/blockchain.routes'))
 app.use('/api/admin',       require('./routes/admin.routes'))
 app.use('/api/farmers',     require('./routes/farmer.routes'))
 app.use('/api/purchasers',  require('./routes/purchaser.routes'))
+app.use('/api/ai',          require('./routes/ai.routes'))
 
 // ── Health check ─────────────────────────────────────────────────
 app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() }))

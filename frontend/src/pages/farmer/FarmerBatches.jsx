@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DashboardLayout from '../../components/common/DashboardLayout'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import DualPredictionBadge from '../../components/common/DualPredictionBadge'
 import { fmtDate } from '../../utils/formatDate'
 import batchService from '../../services/batch.service'
 import { Sprout, Plus, Search, Filter, ChevronRight, Clock, CheckCircle2, XCircle, Trash2 } from 'lucide-react'
@@ -114,7 +115,12 @@ export default function FarmerBatches() {
                     <td className="table-cell font-medium text-white">{b.cropName}</td>
                     <td className="table-cell font-mono text-xs text-brand-300">{b.batchId}</td>
                     <td className="table-cell text-white/50">{fmtDate(b.harvestDate)}</td>
-                    <td className="table-cell"><OrganicBadge score={b.organicScore} showBar /></td>
+                    <td className="table-cell">
+                      <OrganicBadge score={b.organicScore} showBar />
+                      <div className="mt-1.5">
+                        <DualPredictionBadge mlPrediction={b.mlPrediction} groqScore={b.groqScore} />
+                      </div>
+                    </td>
                     <td className="table-cell">
                       <span className={cfg.cls}><Icon size={10} /> {cfg.label}</span>
                     </td>

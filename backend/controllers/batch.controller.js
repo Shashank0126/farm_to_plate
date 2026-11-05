@@ -5,7 +5,8 @@ const blockchain  = require('../blockchain/Blockchain')
 const generateId  = require('../utils/generateBatchId')
 const { calcOrganicScore } = require('../services/organic.service')
 const { recalcTrustScore } = require('../services/trust.service')
-const { predictOrganic }   = require('../services/mlClient.service')
+const { predictOrganic, predictFraud } = require('../services/mlClient.service')
+const { getGroqOrganicAssessment } = require('../services/groq.service')
 const { extractUploadedUrls } = require('../middleware/upload.middleware')
 const { emitToUser, emitToAdmins } = require('../sockets/socket.handler')
 const { ok, err, created, notFound, serverError } = require('../utils/apiResponse')
@@ -21,14 +22,29 @@ async function create(req, res) {
     } = req.body
 
     const organicScore = calcOrganicScore({ fertilizerType, soilQuality, season, irrigationType, cropName })
+    const mlFeatures = { fertilizerType, soilQuality, season, irrigationType, cropName }
 
-    // Optional ML prediction (non-blocking)
-    let mlPrediction = null
-    try {
-      mlPrediction = await predictOrganic({ fertilizerType, soilQuality, season, irrigationType, cropName })
-    } catch {}
+    const [mlPrediction, fraudRisk, groqAssessment] = await Promise.all([
+      predictOrganic(mlFeatures),
+      predictFraud(mlFeatures),
+      getGroqOrganicAssessment({
+        fertilizerType,
+        fertilizerName,
+        fertilizerQty,
+        areaHectares,
+        soilQuality,
+        season,
+        irrigationType,
+        cropName,
+        notes
+      })
+    ])
 
     const proofImages = extractUploadedUrls(req.files)
+    const groqScore = groqAssessment ? Math.round((groqAssessment.organic_probability || 0) * 100) : null
+    // Convert ML predictions from 0-1 range to 0-100 percentage
+    const mlPredictionPercent = mlPrediction ? Math.round(mlPrediction * 100) : null
+    const fraudRiskPercent = fraudRisk ? Math.round(fraudRisk * 100) : null
 
     const batch = await CropBatch.create({
       batchId:       generateId(cropName),
@@ -43,7 +59,8 @@ async function create(req, res) {
       fertilizerType, fertilizerName,
       fertilizerQty: fertilizerQty ? parseFloat(fertilizerQty) : undefined,
       irrigationType,
-      organicScore,  mlPrediction,
+      organicScore,  mlPrediction: mlPredictionPercent, fraudRisk: fraudRiskPercent,
+      groqScore, groqConfidence: groqAssessment?.confidence || null, groqReasoning: groqAssessment?.reasoning || null,
       proofImages,   notes,
       status:        'pending',
     })
@@ -292,4 +309,49 @@ async function purchase(req, res) {
   }
 }
 
-module.exports = { create, myBatches, getById, getVerified, getAll, verify, reject, deleteBatch, trace, purchase }
+// ── PREDICT PREVIEW ──────────────────────────────────────────────
+async function predictPreview(req, res) {
+  try {
+    const {
+      fertilizerType, fertilizerName, fertilizerQty, areaHectares,
+      soilQuality, season, irrigationType, cropName, notes
+    } = req.body
+
+    const organicScore = calcOrganicScore({ fertilizerType, soilQuality, season, irrigationType, cropName })
+    const mlFeatures = { fertilizerType, soilQuality, season, irrigationType, cropName }
+
+    const [mlPrediction, fraudRisk, groqAssessment] = await Promise.all([
+      predictOrganic(mlFeatures),
+      predictFraud(mlFeatures),
+      getGroqOrganicAssessment({
+        fertilizerType,
+        fertilizerName,
+        fertilizerQty,
+        areaHectares,
+        soilQuality,
+        season,
+        irrigationType,
+        cropName,
+        notes
+      })
+    ])
+
+    const groqScore = groqAssessment ? Math.round((groqAssessment.organic_probability || 0) * 100) : null
+    const mlPredictionPercent = mlPrediction != null ? Math.round(mlPrediction * 100) : null
+    const fraudRiskPercent = fraudRisk != null ? Math.round(fraudRisk * 100) : null
+
+    return ok(res, {
+      organicScore,
+      mlPrediction: mlPredictionPercent,
+      fraudRisk: fraudRiskPercent,
+      groqScore,
+      groqConfidence: groqAssessment?.confidence || null,
+      groqReasoning: groqAssessment?.reasoning || null,
+    })
+  } catch (e) {
+    return serverError(res, e)
+  }
+}
+
+module.exports = { create, myBatches, getById, getVerified, getAll, verify, reject, deleteBatch, trace, purchase, predictPreview }
+

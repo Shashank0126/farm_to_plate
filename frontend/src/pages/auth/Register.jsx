@@ -8,7 +8,7 @@ export default function Register() {
   const { register } = useAuth()
   const navigate     = useNavigate()
 
-  const [form,    setForm]    = useState({ name: '', email: '', password: '', confirm: '', role: 'farmer', phone: '' })
+  const [form,    setForm]    = useState({ name: '', email: '', password: '', confirm: '', role: 'farmer', phone: '', aadhaarNumber: '' })
   const [showPw,  setShowPw]  = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -16,11 +16,17 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const cleanAadhaar = form.aadhaarNumber.replace(/\s+/g, '')
+    if (!/^\d{12}$/.test(cleanAadhaar)) {
+      toast.error('Aadhaar number must be exactly 12 numeric digits')
+      return
+    }
     if (form.password !== form.confirm) { toast.error('Passwords do not match'); return }
     if (form.password.length < 8)       { toast.error('Password must be at least 8 characters'); return }
     setLoading(true)
     try {
       const { confirm, ...payload } = form
+      payload.aadhaarNumber = cleanAadhaar
       const user = await register(payload)
       toast.success(`Account created! Welcome, ${user.name}`)
       navigate(`/${user.role}`, { replace: true })
@@ -74,6 +80,22 @@ export default function Register() {
           <div>
             <label className="label">Full Name</label>
             <input name="name" required className="input" placeholder="Ravi Kumar" value={form.name} onChange={handleChange} />
+          </div>
+
+          {/* Aadhaar Number */}
+          <div>
+            <label className="label">Aadhaar Number (12 Digits)</label>
+            <input
+              name="aadhaarNumber"
+              type="text"
+              required
+              maxLength={14}
+              className="input tracking-wider font-mono"
+              placeholder="1234 5678 9012"
+              value={form.aadhaarNumber}
+              onChange={handleChange}
+            />
+            <p className="text-[10px] text-white/40 mt-1">Required for identity verification (Unique 1 account per Aadhaar)</p>
           </div>
 
           {/* Email */}

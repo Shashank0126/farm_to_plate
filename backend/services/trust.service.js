@@ -15,7 +15,7 @@ async function recalcTrustScore(farmerId) {
     const base    = 5
     const penalty = Math.min(complaints * 0.25, 3)   // max −3 from complaints
     const bonus   = Math.min(verified   * 0.1,  1)   // max +1 from verified batches
-    const score   = Math.max(0, parseFloat((base - penalty + bonus).toFixed(1)))
+    const score   = Math.min(5, Math.max(0, parseFloat((base - penalty + bonus).toFixed(1))))
 
     farmer.trustScore      = score
     farmer.verifiedBatches = verified

@@ -16,6 +16,9 @@ router.get('/my',                  protect, authorize('farmer'), ctrl.myBatches)
 // Admin — all batches
 router.get('/',                    protect, authorize('admin'), ctrl.getAll)
 
+// Predict preview (live AI & ML estimation)
+router.post('/predict-preview',    protect, ctrl.predictPreview)
+
 // Create batch (farmer + file upload)
 router.post('/',                   protect, authorize('farmer'), batchUpload, ctrl.create)
 

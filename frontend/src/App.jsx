@@ -32,6 +32,9 @@ import ScanQR from './pages/consumer/ScanQR'
 import Trace from './pages/consumer/Trace'
 import Landing from './pages/Landing'
 
+// Chatbot Assistant
+import FarmBotWidget from './components/chat/FarmBotWidget'
+
 export default function App() {
   return (
     <AuthProvider>
@@ -87,6 +90,7 @@ export default function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <FarmBotWidget />
       </SocketProvider>
     </AuthProvider>
   )

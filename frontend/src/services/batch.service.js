@@ -2,8 +2,9 @@ import api from './api'
 
 const batchService = {
   // Farmer
-  create:       (formData) => api.post('/batches',          formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
-  update:       (id, data) => api.put(`/batches/${id}`,     data),
+  create:         (formData) => api.post('/batches',          formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  predictPreview: (data)     => api.post('/batches/predict-preview', data),
+  update:         (id, data) => api.put(`/batches/${id}`,     data),
   delete:       (id)       => api.delete(`/batches/${id}`),
   myBatches:    ()         => api.get('/batches/my'),
   getById:      (id)       => api.get(`/batches/${id}`),

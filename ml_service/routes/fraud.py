@@ -8,8 +8,16 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import logging
 
-from ..utils.preprocess   import build_feature_vector
-from ..utils.model_loader import predict_fraud
+try:
+    from ml_service.utils.preprocess import build_feature_vector
+    from ml_service.utils.model_loader import predict_fraud
+except ImportError:
+    try:
+        from ..utils.preprocess import build_feature_vector
+        from ..utils.model_loader import predict_fraud
+    except ImportError:
+        from utils.preprocess import build_feature_vector
+        from utils.model_loader import predict_fraud
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -99,5 +107,13 @@ def fraud_risk_query(
 
 
 def _is_model_loaded() -> bool:
-    from ..utils.model_loader import _FRAUD_MODEL
-    return _FRAUD_MODEL is not None
+    try:
+        from ml_service.utils.model_loader import _FRAUD_MODEL
+        return _FRAUD_MODEL is not None
+    except ImportError:
+        try:
+            from ..utils.model_loader import _FRAUD_MODEL
+            return _FRAUD_MODEL is not None
+        except ImportError:
+            from utils.model_loader import _FRAUD_MODEL
+            return _FRAUD_MODEL is not None

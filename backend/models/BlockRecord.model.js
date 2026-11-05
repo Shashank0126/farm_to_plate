@@ -11,6 +11,7 @@ const blockRecordSchema = new mongoose.Schema({
   type:         { type: String, enum: ['genesis', 'batch', 'purchase', 'verification'], default: 'batch' },
 }, {
   timestamps: false,
+  collection: 'blocks'
 })
 
 module.exports = mongoose.model('BlockRecord', blockRecordSchema)

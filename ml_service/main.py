@@ -13,9 +13,22 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 import logging
+import sys
 
-from .routes.predict import router as predict_router
-from .routes.fraud   import router as fraud_router
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+try:
+    from ml_service.routes.predict import router as predict_router
+    from ml_service.routes.fraud import router as fraud_router
+except ImportError:
+    try:
+        from .routes.predict import router as predict_router
+        from .routes.fraud import router as fraud_router
+    except ImportError:
+        from routes.predict import router as predict_router
+        from routes.fraud import router as fraud_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,7 +44,7 @@ app = FastAPI(
 # ── CORS ─────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins  = [os.getenv("CLIENT_URL", "http://localhost:5000")],
+    allow_origins  = ["*"],
     allow_methods  = ["*"],
     allow_headers  = ["*"],
 )
@@ -48,7 +61,10 @@ def health():
 # ── Model info ───────────────────────────────────────────────────
 @app.get("/model/info", tags=["Status"])
 def model_info():
-    from .utils.preprocess import FEATURE_COLUMNS
+    if __package__ in (None, ''):
+        from utils.preprocess import FEATURE_COLUMNS
+    else:
+        from .utils.preprocess import FEATURE_COLUMNS
     return {
         "model"      : "Random Forest Classifier",
         "version"    : "1.0.0",

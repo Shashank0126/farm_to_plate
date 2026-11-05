@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DashboardLayout from '../../components/common/DashboardLayout'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import DualPredictionBadge from '../../components/common/DualPredictionBadge'
 import TrustScore from '../../components/common/TrustScore'
 import batchService from '../../services/batch.service'
 import { fmtDate } from '../../utils/formatDate'
@@ -95,12 +96,15 @@ export default function BrowseBatches() {
 
               {/* Scores */}
               <div className="grid grid-cols-2 gap-2">
-                <div className="glass rounded-xl p-2">
-                  <p className="text-[10px] text-white/30">Organic</p>
+                <div className="glass rounded-xl p-2.5">
+                  <p className="text-[10px] text-white/40 mb-1">Organic Authenticity</p>
                   <OrganicBadge score={b.organicScore} />
+                  <div className="mt-2">
+                    <DualPredictionBadge mlPrediction={b.mlPrediction} groqScore={b.groqScore} />
+                  </div>
                 </div>
-                <div className="glass rounded-xl p-2">
-                  <p className="text-[10px] text-white/30">Farmer Trust</p>
+                <div className="glass rounded-xl p-2.5">
+                  <p className="text-[10px] text-white/40 mb-1">Farmer Trust</p>
                   <TrustScore score={b.farmer?.trustScore ?? 0} size="sm" />
                 </div>
               </div>

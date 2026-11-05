@@ -13,9 +13,10 @@ export function SocketProvider({ children }) {
   useEffect(() => {
     if (!user) return
 
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+    const socketUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'
+    const socket = io(socketUrl, {
       auth: { token: localStorage.getItem('ftp_token') },
-      transports: ['websocket'],
+      transports: ['polling', 'websocket'],
     })
 
     socketRef.current = socket

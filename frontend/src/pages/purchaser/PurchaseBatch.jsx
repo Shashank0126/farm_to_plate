@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import DashboardLayout from '../../components/common/DashboardLayout'
 import OrganicBadge from '../../components/common/OrganicBadge'
+import PredictionCard from '../../components/common/PredictionCard'
 import TrustScore from '../../components/common/TrustScore'
 import TxHashBadge from '../../components/blockchain/TxHashBadge'
 import batchService from '../../services/batch.service'
@@ -83,15 +84,16 @@ export default function PurchaseBatch() {
               <div className="flex items-center gap-2"><Leaf size={12} /> {batch.fertilizerType} fertilizer</div>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <div className="glass rounded-xl p-3">
-                <p className="text-[10px] text-white/30">Organic Score</p>
-                <OrganicBadge score={batch.organicScore} showBar />
-              </div>
-              <div className="glass rounded-xl p-3">
-                <p className="text-[10px] text-white/30">Farmer Trust</p>
-                <TrustScore score={batch.farmer?.trustScore ?? 0} size="sm" />
-              </div>
+            <div className="mt-4">
+              <PredictionCard
+                organicScore={batch.organicScore}
+                mlPrediction={batch.mlPrediction}
+                groqScore={batch.groqScore}
+                groqConfidence={batch.groqConfidence}
+                groqReasoning={batch.groqReasoning}
+                fraudRisk={batch.fraudRisk}
+                title="Organic Authenticity & Predictions"
+              />
             </div>
 
             <div className="mt-3">

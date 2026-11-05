@@ -8,16 +8,28 @@ function signToken(id) {
 
 async function register(req, res) {
   try {
-    const { name, email, password, role, phone } = req.body
+    const { name, email, password, role, phone, aadhaarNumber } = req.body
 
     if (!['farmer','purchaser'].includes(role)) {
       return err(res, 'Invalid role. Must be farmer or purchaser.')
     }
 
+    if (!aadhaarNumber) {
+      return err(res, 'Aadhaar number is required for registration.')
+    }
+
+    const cleanAadhaar = String(aadhaarNumber).replace(/\s+/g, '')
+    if (!/^\d{12}$/.test(cleanAadhaar)) {
+      return err(res, 'Aadhaar number must be exactly 12 numeric digits.')
+    }
+
     const exists = await User.findOne({ email })
     if (exists) return err(res, 'Email already registered')
 
-    const user  = await User.create({ name, email, password, role, phone })
+    const aadhaarExists = await User.findOne({ aadhaarNumber: cleanAadhaar })
+    if (aadhaarExists) return err(res, 'Aadhaar number already registered. Only one account per Aadhaar is allowed.')
+
+    const user  = await User.create({ name, email, password, role, phone, aadhaarNumber: cleanAadhaar })
     const token = signToken(user._id)
 
     return created(res, { token, user: user.toPublic() })

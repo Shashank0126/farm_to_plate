@@ -33,7 +33,11 @@ const cropBatchSchema = new mongoose.Schema({
 
   // Scoring
   organicScore:  { type: Number, default: 0 },   // 0–100
-  mlPrediction:  { type: Number },               // from FastAPI
+  mlPrediction:  { type: Number },               // from FastAPI organic endpoint
+  fraudRisk:     { type: Number },               // from FastAPI fraud endpoint
+  groqScore:     { type: Number },               // from Groq review
+  groqConfidence:{ type: String },               // low|medium|high
+  groqReasoning: { type: String },               // Groq review explanation
 
   // Status & verification
   status:        { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
@@ -56,7 +60,6 @@ const cropBatchSchema = new mongoose.Schema({
 // Indexes
 cropBatchSchema.index({ farmer: 1, status: 1 })
 cropBatchSchema.index({ status: 1, createdAt: -1 })
-cropBatchSchema.index({ batchId: 1 })
 cropBatchSchema.index({ cropName: 'text', farmerName: 'text', farmLocation: 'text' })
 
 module.exports = mongoose.model('CropBatch', cropBatchSchema)
